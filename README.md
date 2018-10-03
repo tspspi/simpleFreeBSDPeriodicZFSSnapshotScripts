@@ -24,14 +24,18 @@ The ZFS snapshot script is controlled by variables set in
 */etc/periodic.conf*. The scripts can be enabled or disabled
 via the
 
-```zfssnap_enable="YES"```
+```
+zfssnap_enable="YES"
+```
 
 variable. Two other configureable variables specify how many
 snapshots should be kept on a daily, weekly and monthly basis.
 For example
 
-```zfssnap_keep_daily="31"
-zfssnap_keep_monthly="12"```
+```
+zfssnap_keep_daily="31"
+zfssnap_keep_monthly="12"
+```
 
 would keep a snapshot for the previous 31 days and monthly
 snapshots for the previous year. Because *zfssnap_keep_weekly*
@@ -41,6 +45,8 @@ Finally zfssnap_filesystems is a space separated list of
 ZFS filesystems for which periodical snapshots should
 be created
 
-```zfssnap_filesystems="zroot/usr/home/userA zroot/usr/home/userB"```
+```
+zfssnap_filesystems="zroot/usr/home/userA zroot/usr/home/userB"
+```
 
 would create snapshots as configured previously.
