@@ -1,0 +1,76 @@
+#!/bin/sh
+
+# ZFS Snapshot generation script. This is a periodic script
+# and can be installed either into weekly, daily or monthly
+# and should be named in one of the following ways:
+#
+# /etc/periodic/daily/600.zfssnap
+# /etc/periodic/weekly/600.zfssnap
+# /etc/periodic/monthly/600.zfssnap
+#
+# These scripts should have 555 permissions.
+
+# The following line should be set to
+#   daily
+#   weekly
+#   monthly
+# according to the periodic directory it's located in ...
+
+periodictype="monthly"
+
+# If there is a global system configuration file for periodic, read it
+if [ -r /etc/defaults/periodic.conf ]; then
+    . /etc/defaults/periodic.conf
+    source_periodic_confs
+fi
+
+case "$zfssnap_enable" in
+    [Yy][Ee][Ss])
+	    ;;
+    *)
+	    return 0
+	    ;;
+esac
+
+. /etc/periodic/zfssnap.sh
+
+# Load list of datasets
+
+dslist=${zfssnap_filesystems}
+if [ -z $dslist ]; then
+    echo "zfssnap: No datasets have been specified via zfssnap_filesystems rc.conf parameter. This should be a space separated list of datasets"
+    return 1
+fi
+
+
+# Load number of snaps to keep
+case "${periodictype}" in
+    daily)
+	keeprecs=${zfssnap_keep_daily}
+	if [ -z ${keeprecs} ]; then
+		echo "zfssnap: No daily snapshots kept. Specify the amount of snapshots to keep via zfssnap_keep_daily to enable"
+		return 1
+	fi
+	zfssnap_runsnaps "${dslist}" "${periodictype}" "${keeprecs}"
+	;;
+    weekly)
+	keeprecs=${zfssnap_keep_weekly}
+	if [ -z ${keeprecs} ]; then
+		echo "zfssnap: No weekly snapshots kept. Specify the amount of snapshots to keep via zfssnap_keep_weekly to enable"
+		return 1
+	fi
+	zfssnap_runsnaps "${dslist}" "${periodictype}" "${keeprecs}"
+	;;
+    monthly)
+	keeprecs=${zfssnap_keep_monthly}
+	if [ -z ${keeprecs} ]; then
+		echo "zfssnap: No monthly snapshots kept. Specify the amount of snapshots to keep via zfssnap_keep_monthly to enable"
+		return 1
+	fi
+	zfssnap_runsnaps "${dslist}" "${periodictype}" "${keeprecs}"
+	;;
+    *)
+	echo "zfssnap: Unknown snapshot type $2"
+	return 1
+	;;
+esac
